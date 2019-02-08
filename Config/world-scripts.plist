@@ -1,0 +1,14 @@
+(
+    "DayDiplomacy_Engine.js",
+    "DayDiplomacy_EngineAPI.js",
+    "DayDiplomacy_Systems.js",
+    "DayDiplomacy_SystemsAPI.js",
+    "DayDiplomacy_EconomyEngine.js",
+    "DayDiplomacy_EconomyEngineAPI.js",
+    "DayDiplomacy_AlliancesEngine.js",
+    "DayDiplomacy_AlliancesEngineAPI.js",
+    "DayDiplomacy_Alliances.js",
+    "DayDiplomacy_History.js",
+    "DayDiplomacy_HistoryAPI.js",
+    "DayDiplomacy_Citizenships.js"
+)
