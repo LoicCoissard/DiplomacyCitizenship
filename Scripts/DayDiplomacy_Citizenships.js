@@ -6,10 +6,6 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script displays the citizenship.";
 
 /*************************** OXP private functions *******************************************************/
-this._myCitizenships=function(){
-    this._citizenships;
-}
-
 this._F4InterfaceCallback = function (choice) {
     this._resetLinks();
     switch (choice) {
@@ -23,12 +19,15 @@ this._F4InterfaceCallback = function (choice) {
     }
 };
 
-this._buyCitizenship = function(citizenships){
-    this._citizenships=system.info.galaxyID +" "+ system.info.systemID;
+// citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
+this._buyCitizenship = function(citizenship){
+	var id = citizenship[galaxyID] + " " + citizenship[systemID];
+    this._citizenships[id]=citizenship;
 }
 
-this._loseCitizenship = function(citizenships){
-    //this.citizenships[]=citizenships;
+this._loseCitizenship = function(citizenship){
+    //retirer clé :
+    delete this._citizenships[id];
 }
 
 this._runCitizenship = function () {
@@ -88,6 +87,7 @@ this._startUp = function () {
 };
 this.startUp = function () {
     worldScripts.DayDiplomacy_000_Engine.$subscribe(this.name);
+
     delete this.startUp; // No need to startup twice
 };
 /*************************** End Oolite events ***********************************************************/
