@@ -6,16 +6,41 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script displays the citizenship.";
 
 /*************************** OXP private functions *******************************************************/
+this._myCitizenships=function(){
+    this._citizenships;
+}
+
+this._F4InterfaceCallback = function (choice) {
+    this._resetLinks();
+    switch (choice) {
+        case "BUY":
+            this._BuyCitizenship();
+            break;
+        case "LOSE":
+            this._LoseCitizenship();
+            break;
+        default : //"EXIT":
+    }
+};
+
+this._buyCitizenship = function(citizenships){
+    this._citizenships=system.info.galaxyID +" "+ system.info.systemID;
+}
+
+this._loseCitizenship = function(citizenships){
+    //this.citizenships[]=citizenships;
+}
+
 this._runCitizenship = function () {
     var opts = {
         screenID: "DiplomacyCitizenshipsScreenId",
         title: "Citizenship",
         allowInterrupt: true,
         exitScreen: "GUI_SCREEN_INTERFACES",
-        choices: {"EXIT": "Exit"},
+        choices: {"BUY":"Buy","LOSE":"Lose","EXIT": "Exit"},
         message: String(system.info.galaxyID) +" "+ String(system.info.systemID)
     };
-    mission.runScreen(opts);
+    mission.runScreen(opts, this._F4InterfaceCallback.bind(this));
 };
 
 this._displayF4Interface = function () {
@@ -56,6 +81,8 @@ this._startUp = function () {
     this._eff = api.$initAndReturnSavedData("eventFormatingFunctionsIds", {}); // { eventType => functionId }
 
     this._initF4Interface();
+
+    this._citizenships = api.$initAndReturnSavedData("citizenships", {}); // { citizenship => citizenship }
 
     delete this._startUp; // No need to startup twice
 };
