@@ -6,45 +6,34 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script displays the citizenship.";
 
 /*************************** OXP private functions *******************************************************/
-this._buildID =function (galaxyID systemID){
-
-}
+this._buildID =function (galaxyID, systemID){
+    // For us, the unique identifier is the name.
+    return this._api.$getActors()[this._sapi.$getSystemsActorIdsByGalaxyAndSystemId()[galaxyID][systemID]].name;
+};
 
 this._F4InterfaceCallback = function (choice) {
-    this._resetLinks();
     switch (choice) {
         case "BUY":
             this._buyCitizenship({"galaxyID":system.info.galaxyID, "systemID":system.info.systemID});
+            this._publishNewsSubscribers();
             break;
         case "LOSE":
             this._loseCitizenship({"galaxyID":system.info.galaxyID, "systemID":system.info.systemID});
+            this._publishNewsSubscribers();
             break;
         default : //"EXIT":
     }
 };
 
-this._myCitizenships=function(){
-    var
-    var message="";
-    var c = this._citizenships;
-    var i = c.length;
-    while (i--){
-        message += systemNameForID(this._citizenships[i])+"\n";
-    }
-    return message;
-}
-
 // citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
 this._buyCitizenship = function(citizenship){
-    var id = citizenship["galaxyID"] + " " + citizenship["systemID"];
-    this._citizenships[id]=citizenship;
-}
+    this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)]=citizenship;
+};
 
 this._loseCitizenship = function(citizenship){
     //retirer clé :
-    var id = citizenship["galaxyID"] + " " + citizenship["systemID"];
-    delete this._citizenships[id];
-}
+    delete this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)];
+};
 
 this._runCitizenship = function () {
     var opts = {
@@ -52,8 +41,8 @@ this._runCitizenship = function () {
         title: "Citizenship",
         allowInterrupt: true,
         exitScreen: "GUI_SCREEN_INTERFACES",
-        choices: {"BUY":"Buy","LOSE":"Lose","EXIT": "Exit"},
-         message:this._myCitizenships() //String(system.info.galaxyID) +" "+ String(system.info.systemID)
+        choices: {BUY:"Buy","LOSE":"Lose","EXIT": "Exit"},
+         message:this.$buildCitizenshipsString(this._citizenships)
     };
     mission.runScreen(opts, this._F4InterfaceCallback.bind(this));
 };
@@ -73,59 +62,60 @@ this._initF4Interface = function () {
         });
 };
 
-this._publishNewsSubscribers=function(){
-    var myNewSubscriber=this._;
-    var l=myNewSubscriber.length;
-    while (l--)
-    for(subscriber in this._citizenshipsNewsSubscribers){
-        subscriber.$citizenshipsChanged(this._citizenships);
+this._publishNewsSubscribers=function() {
+    var myNewSubscribers = this._citizenshipsNewsSubscribers;
+    var l = myNewSubscribers.length;
+    while (l--){
+        worldScripts[myNewSubscribers[l]].$citizenshipsChanged(this._citizenships);
     }
-}
+};
 /*************************** End OXP private functions ***************************************************/
 
 /*************************** OXP public functions ********************************************************/
-this.$subscribeToCitizenshipsNews=function(){
+
+this.$buildCitizenshipsString = function(citizenships) {
+        var result = "";
+        for (var name in citizenships) {
+            if (citizenships.hasOwnProperty(name)) {
+                result += name + ", ";
+            }
+        }
+        if (result.length) {
+            result = result.substring(0, result.length-2);
+        }
+        return result;
+};
+
+this.$subscribeToCitizenshipsNews=function(scriptname){
     this._citizenshipsNewsSubscribers.push(scriptname); //permet de subscriber
-}
-this.$citizenshipsChanged(citizenships){
+};
 
-}
-
-this.$getSystemsNameByGalaxyAndSystemId = function() {
-    // FIXME perfectperf have the current galaxy saved somewhere?
-    return this._systemsByGalaxyAndSystemId[system.info.galaxyID];
+this.$citizenshipsChanged=function(citizenships){
+    log("DayDiplomacy_60_citizenships.$citizenshipsChanged","new citizenships: "
+        +this.$buildCitizenshipsString(citizenships));
 };
 /*************************** End OXP public functions ****************************************************/
 
 /*************************** Oolite events ***************************************************************/
-this.infoSystemChanged = function (currentSystemId, previousSystemId) {
-    this._selectedSystemActorId = this._sapi.$getCurrentGalaxySystemsActorIdsBySystemsId()[currentSystemId];
-};
 this.shipDockedWithStation = function (station) {
     this._initF4Interface();
 };
 this.missionScreenEnded = function () {
     player.ship.hudHidden = false;
-}
+};
 this._startUp = function () {
     var api = this._api = worldScripts.DayDiplomacy_002_EngineAPI;
-    this._systemsByGalaxyAndSystemId = api.$initAndReturnSavedData("systemsByGalaxyAndSystemId", {});
     this._sapi = worldScripts.DayDiplomacy_012_SystemsAPI;
-    this._F = api.$getFunctions();
-    this._selectedSystemActorId = this._sapi.$getCurrentGalaxySystemsActorIdsBySystemsId()[system.info.systemID]; // FIXME perfectperf?
-    this._eff = api.$initAndReturnSavedData("eventFormatingFunctionsIds", {}); // { eventType => functionId }
 
+    this._citizenships = api.$initAndReturnSavedData("citizenships", {}); // { systemName => citizenship }
+    this._citizenshipsNewsSubscribers = api.$initAndReturnSavedData("citizenshipsNewsSubscribers",[]);
+    this.$subscribeToCitizenshipsNews(this.name);
     this._initF4Interface();
-
-    this._citizenships = api.$initAndReturnSavedData("citizenships", {}); // { citizenship => citizenship }
-
-    this._citizenshipsNewsSubscribers=[];
-
     delete this._startUp; // No need to startup twice
 };
 this.startUp = function () {
     worldScripts.DayDiplomacy_000_Engine.$subscribe(this.name);
-    this._s.$subscribe(this.name);
+
     delete this.startUp; // No need to startup twice
 };
 /*************************** End Oolite events ***********************************************************/
