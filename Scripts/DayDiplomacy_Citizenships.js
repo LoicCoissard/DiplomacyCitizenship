@@ -16,10 +16,12 @@ this._F4InterfaceCallback = function (choice) {
         case "BUY":
             this._buyCitizenship({"galaxyID":system.info.galaxyID, "systemID":system.info.systemID});
             this._publishNewsSubscribers();
+            this._runCitizenship();
             break;
         case "LOSE":
             this._loseCitizenship({"galaxyID":system.info.galaxyID, "systemID":system.info.systemID});
             this._publishNewsSubscribers();
+            this._runCitizenship();
             break;
         default : //"EXIT":
     }
