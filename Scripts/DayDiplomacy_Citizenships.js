@@ -6,12 +6,12 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script displays the citizenship.";
 
 /*************************** OXP private functions *******************************************************/
-this._buildID =function (galaxyID, systemID){
+this._buildID =function (galaxyID, systemID){ //engine
     // For us, the unique identifier is the name.
     return this._api.$getActors()[this._sapi.$getSystemsActorIdsByGalaxyAndSystemId()[galaxyID][systemID]].name;
 };
 
-this._F4InterfaceCallback = function (choice) {
+this._F4InterfaceCallback = function (choice) {//engine
     switch (choice) {
         case "BUY":
             this._buyCitizenship({"galaxyID":system.info.galaxyID, "systemID":system.info.systemID});
@@ -27,34 +27,46 @@ this._F4InterfaceCallback = function (choice) {
     }
 };
 
+this._payForCitizenship=function(){
+    var CitizenshipPrice= 1;
+    if(player.credits>=CitizenshipPrice){
+        player.credits -= CitizenshipPrice;
+    }
+    else{
+        ignore();
+    }
+};
+
 // citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
-this._buyCitizenship = function(citizenship){
+this._buyCitizenship = function(citizenship){//engine
+    this._payForCitizenship();
     this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)]=citizenship;
 };
 
-this._loseCitizenship = function(citizenship){
+this._loseCitizenship = function(citizenship){//engine
     //retirer clé :
+    this._payForCitizenship();
     delete this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)];
 };
 
-this._runCitizenship = function () {
+this._runCitizenship = function () {//engine
     var opts = {
         screenID: "DiplomacyCitizenshipsScreenId",
         title: "Citizenship",
         allowInterrupt: true,
         exitScreen: "GUI_SCREEN_INTERFACES",
         choices: {BUY:"Buy","LOSE":"Lose","EXIT": "Exit"},
-         message:this.$buildCitizenshipsString(this._citizenships)
+         message:"Citizenships: "+this.$buildCitizenshipsString(this._citizenships)
     };
     mission.runScreen(opts, this._F4InterfaceCallback.bind(this));
 };
 
-this._displayF4Interface = function () {
+this._displayF4Interface = function () {//engine
     player.ship.hudHidden || (player.ship.hudHidden = true);
     this._runCitizenship();
 };
 
-this._initF4Interface = function () {
+this._initF4Interface = function () {//enine
     player.ship.dockedStation.setInterface("DiplomacyCitizenships",
         {
             title: "Citizenships",
@@ -64,7 +76,7 @@ this._initF4Interface = function () {
         });
 };
 
-this._publishNewsSubscribers=function() {
+this._publishNewsSubscribers=function() {//engine
     var myNewSubscribers = this._citizenshipsNewsSubscribers;
     var l = myNewSubscribers.length;
     while (l--){
@@ -75,7 +87,7 @@ this._publishNewsSubscribers=function() {
 
 /*************************** OXP public functions ********************************************************/
 
-this.$buildCitizenshipsString = function(citizenships) {
+this.$buildCitizenshipsString = function(citizenships) {//engine et dans l'api mettre une fonction qui peut l'appeler
         var result = "";
         for (var name in citizenships) {
             if (citizenships.hasOwnProperty(name)) {
@@ -88,18 +100,18 @@ this.$buildCitizenshipsString = function(citizenships) {
         return result;
 };
 
-this.$subscribeToCitizenshipsNews=function(scriptname){
+this.$subscribeToCitizenshipsNews=function(scriptname){//engine et API
     this._citizenshipsNewsSubscribers.push(scriptname); //permet de subscriber
 };
 
-this.$citizenshipsChanged=function(citizenships){
+this.$citizenshipsChanged=function(citizenships){//laisser ici
     log("DayDiplomacy_60_citizenships.$citizenshipsChanged","new citizenships: "
         +this.$buildCitizenshipsString(citizenships));
 };
 /*************************** End OXP public functions ****************************************************/
 
 /*************************** Oolite events ***************************************************************/
-this.shipDockedWithStation = function (station) {
+this.shipDockedWithStation = function (station) {//engine
     this._initF4Interface();
 };
 this.missionScreenEnded = function () {
@@ -111,8 +123,8 @@ this._startUp = function () {
 
     this._citizenships = api.$initAndReturnSavedData("citizenships", {}); // { systemName => citizenship }
     this._citizenshipsNewsSubscribers = api.$initAndReturnSavedData("citizenshipsNewsSubscribers",[]);
-    this.$subscribeToCitizenshipsNews(this.name);
-    this._initF4Interface();
+    this.$subscribeToCitizenshipsNews(this.name); //laisser ici
+    this._initF4Interface(); //engine
     delete this._startUp; // No need to startup twice
 };
 this.startUp = function () {
