@@ -9,12 +9,18 @@ this.description = "This script is the citizenships API.";
 /*************************** End OXP private functions ***************************************************/
 
 /*************************** OXP public functions ********************************************************/
+this.$buildCitizenshipsString = function (citizenships) {
+    return this._capi.$buildCitizenshipsString(citizenships);
+};
+
+this.$subscribeToCitizenshipsNews = function (scriptname) {
+    return this.capi.$subscribeToCitizenshipsNews(scriptname);
+};
 /*************************** End OXP public functions ****************************************************/
 
 /*************************** Oolite events ***************************************************************/
 this._startUp = function () {
-    var api = this._api = worldScripts.DayDiplomacy_002_EngineAPI;
-    this._sapi = worldScripts.DayDiplomacy_012_SystemsAPI;
+    this._capi = worldScripts.DayDiplomacy_060_CitizenshipsEngine;
     delete this._startUp();
 };
 
