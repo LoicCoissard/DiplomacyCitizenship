@@ -76,7 +76,7 @@ this._publishNewsSubscribers = function () {
     var myNewSubscribers = this._citizenshipsNewsSubscribers;
     var l = myNewSubscribers.length;
     while (l--) {
-        worldScripts[myNewSubscribers[l]].$citizenshipsChanged(this._citizenships);
+        worldScripts[myNewSubscribers[l]].$playerCitizenshipsUpdated(this._citizenships);
     }
 };
 /*************************** End OXP private functions ***************************************************/
@@ -95,7 +95,7 @@ this.$buildCitizenshipsString = function (citizenships) {
     return result;
 };
 
-this.$subscribeToCitizenshipsNews = function (scriptname) {
+this.$subscribeToPlayerCitizenshipsUpdates = function (scriptname) {
     this._citizenshipsNewsSubscribers.push(scriptname);
 };
 /*************************** End OXP public functions ****************************************************/

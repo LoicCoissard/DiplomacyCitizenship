@@ -6,14 +6,16 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script is the citizenships API.";
 
 /*************************** OXP public functions ********************************************************/
-// return the citizenships
+// return a string to display containing citizenships
 this.$buildCitizenshipsString = function (citizenships) {
     return this._capi.$buildCitizenshipsString(citizenships);
 };
 
-// return the list of the ships wich are subscribes to a citizenship
-this.$subscribeToCitizenshipsNews = function (scriptname) {
-    return this._capi.$subscribeToCitizenshipsNews(scriptname);
+// subscribes the script which name is given as argument to be called when the player citizenships are updated
+// the script must implement the function this.$playerCitizenshipsUpdated = function(citizenships) {}
+// citizenships is a list of citizenship: [{systemName:{'galaxyID':int, 'systemID':int}}, ...]
+this.$subscribeToPlayerCitizenshipsUpdates = function (scriptname) {
+    return this._capi.$subscribeToPlayerCitizenshipsUpdates(scriptname);
 };
 /*************************** End OXP public functions ****************************************************/
 

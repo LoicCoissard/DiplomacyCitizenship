@@ -6,8 +6,8 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script displays the citizenship.";
 
 /*************************** OXP public functions ********************************************************/
-this.$citizenshipsChanged = function (citizenships) {
-    log("DayDiplomacy_062_CitizenshipsEngineAPI.$citizenshipsChanged", "new citizenships: "
+this.$playerCitizenshipsUpdated = function (citizenships) {
+    log("DayDiplomacy_062_CitizenshipsEngineAPI.$playerCitizenshipsUpdated", "new citizenships: "
         + this._capi.$buildCitizenshipsString(citizenships));
 };
 /*************************** End OXP public functions ****************************************************/
@@ -15,7 +15,7 @@ this.$citizenshipsChanged = function (citizenships) {
 /*************************** Oolite events ***************************************************************/
 this._startUp = function () {
     this._capi = worldScripts.DayDiplomacy_062_CitizenshipsEngineAPI;
-    this.$subscribeToCitizenshipsNews(this.name);
+    this.$subscribeToPlayerCitizenshipsUpdates(this.name);
     delete this._startUp; // No need to startup twice
 };
 
