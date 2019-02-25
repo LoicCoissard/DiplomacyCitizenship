@@ -1,5 +1,5 @@
 "use strict";
-this.name = "DayDiplomacy_062_CitizenshipsEngineAPI.js";
+this.name = "DayDiplomacy_062_CitizenshipsEngineAPI";
 this.author = "Loic Coissard";
 this.copyright = "(C) 2019 Loic Coissard";
 this.licence = "CC-NC-by-SA 4.0";
@@ -15,7 +15,7 @@ this.$buildCitizenshipsString = function (citizenships) {
 // the script must implement the function this.$playerCitizenshipsUpdated = function(citizenships) {}
 // citizenships is a list of citizenship: [{systemName:{'galaxyID':int, 'systemID':int}}, ...]
 this.$subscribeToPlayerCitizenshipsUpdates = function (scriptname) {
-    return this._capi.$subscribeToPlayerCitizenshipsUpdates(scriptname);
+    this._capi.$subscribeToPlayerCitizenshipsUpdates(scriptname);
 };
 /*************************** End OXP public functions ****************************************************/
 

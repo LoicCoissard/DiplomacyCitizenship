@@ -45,7 +45,7 @@ this._loseCitizenship = function (citizenship) {
     delete this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)];
 };
 
-this._runCitizenship = function () {//engine
+this._runCitizenship = function () {
     var opts = {
         screenID: "DiplomacyCitizenshipsScreenId",
         title: "Citizenship",
@@ -57,12 +57,12 @@ this._runCitizenship = function () {//engine
     mission.runScreen(opts, this._F4InterfaceCallback.bind(this));
 };
 
-this._displayF4Interface = function () {//engine
+this._displayF4Interface = function () {
     player.ship.hudHidden || (player.ship.hudHidden = true);
     this._runCitizenship();
 };
 
-this._initF4Interface = function () {//enine
+this._initF4Interface = function () {
     player.ship.dockedStation.setInterface("DiplomacyCitizenships",
         {
             title: "Citizenships",

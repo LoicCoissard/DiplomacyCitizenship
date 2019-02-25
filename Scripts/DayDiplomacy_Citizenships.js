@@ -14,8 +14,8 @@ this.$playerCitizenshipsUpdated = function (citizenships) {
 
 /*************************** Oolite events ***************************************************************/
 this._startUp = function () {
-    this._capi = worldScripts.DayDiplomacy_062_CitizenshipsEngineAPI;
-    this.$subscribeToPlayerCitizenshipsUpdates(this.name);
+    var capi = this._capi = worldScripts.DayDiplomacy_062_CitizenshipsEngineAPI;
+    capi.$subscribeToPlayerCitizenshipsUpdates(this.name);
     delete this._startUp; // No need to startup twice
 };
 
@@ -23,5 +23,15 @@ this.startUp = function () {
     worldScripts.DayDiplomacy_000_Engine.$subscribe(this.name);
 
     delete this.startUp; // No need to startup twice
+};
+
+this.startUpComplete=function(){
+    var j = system.allShips.length;
+    var ship = system.allShips;
+    log("DayDiplomacyCitizenships.startupComplete","home system"+ship[0].homeSystem);
+    while(j--){
+        log("DayDiplomacyCitizenships.startupComplete","home system"+ship[j].homeSystem);
+    }
+    delete this.startUpComplete;
 };
 /*************************** End Oolite events ***********************************************************/
