@@ -6,7 +6,7 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script is the citizenships engine.";
 
 /*************************** OXP private functions *******************************************************/
-this._buildID = function (galaxyID, systemID) {
+this._retrieveNameFromSystem = function (galaxyID, systemID) {
     // For us, the unique identifier is the name.
     return this._api.$getActors()[this._sapi.$getSystemsActorIdsByGalaxyAndSystemId()[galaxyID][systemID]].name;
 };
@@ -34,16 +34,19 @@ this._payForCitizenship = function () {
     }
 };
 
+// citizenships: {systemName: citizenship, ...}
 // citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
-this._buyCitizenship = function (citizenship) {//engine
+this._buyCitizenship = function (citizenship) {
     this._payForCitizenship();
-    this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)] = citizenship;
+    this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)] = citizenship;
 };
 
 this._loseCitizenship = function (citizenship) {
     this._payForCitizenship();
-    delete this._citizenships[this._buildID(citizenship.galaxyID, citizenship.systemID)];
+    delete this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)];
 };
+
+
 
 this._runCitizenship = function () {
     var opts = {
@@ -51,9 +54,18 @@ this._runCitizenship = function () {
         title: "Citizenship",
         allowInterrupt: true,
         exitScreen: "GUI_SCREEN_INTERFACES",
-        choices: {BUY: "Buy", LOSE: "Lose", EXIT: "Exit"},
+        choices: {BUY: "Buy "+this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID)+" citizenship",
+            LOSE: "Lose " +this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID)+" citizenship",
+            EXIT: "Exit"},
         message: "Citizenships: " + this.$buildCitizenshipsString(this._citizenships)
     };
+    for (var systemName in this._citizenships){
+        if (this._citizenships.hasOwnProperty(systemName)){
+            if (system.info.galaxyID===this._citizenships[systemName].galaxyID){
+                opts.choices["DISPLAY_"+this._citizenships[systemName].systemID] = "Display "+systemName+" citizenship";
+            }
+        }
+    }
     mission.runScreen(opts, this._F4InterfaceCallback.bind(this));
 };
 

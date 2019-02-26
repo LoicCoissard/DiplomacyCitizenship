@@ -6,6 +6,10 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script is the citizenships API.";
 
 /*************************** OXP public functions ********************************************************/
+this.$retrieveNameFromSystem = function(galaxyID, systemID){
+    return this._capi._retrieveNameFromSystem(galaxyID, systemID);
+};
+
 // return a string to display containing citizenships
 this.$buildCitizenshipsString = function (citizenships) {
     return this._capi.$buildCitizenshipsString(citizenships);
