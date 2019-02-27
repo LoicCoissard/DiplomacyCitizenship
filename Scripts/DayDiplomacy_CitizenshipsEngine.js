@@ -6,27 +6,41 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script is the citizenships engine.";
 
 /*************************** OXP private functions *******************************************************/
+// citizenships: {systemName: citizenship, ...}
+// citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
+
+// {"galaxyID"=>galaxyID, "systemID"=>systemID : name}
+
+/*
+@Description: allows the script which name is given as argument to be called through the method $playerCitizenshipsUpdated each time the player citizenships are updated. The script must implement that method. An example of that method is available in DayDiplomacy_Citizenships.js
+@param scriptname: String ; the script name property
+*
+*/
 this._retrieveNameFromSystem = function (galaxyID, systemID) {
     // For us, the unique identifier is the name.
     return this._api.$getActors()[this._sapi.$getSystemsActorIdsByGalaxyAndSystemId()[galaxyID][systemID]].name;
 };
 
+// choice:{String:function()}
 this._F4InterfaceCallback = function (choice) {
-    switch (choice) {
-        case "BUY":
-            this._buyCitizenship({"galaxyID": system.info.galaxyID, "systemID": system.info.systemID});
-            this._publishNewsSubscribers();
-            this._runCitizenship();
-            break;
-        case "LOSE":
-            this._loseCitizenship({"galaxyID": system.info.galaxyID, "systemID": system.info.systemID});
-            this._publishNewsSubscribers();
-            this._runCitizenship();
-            break;
-        default : //"EXIT":
+    if (choice === "BUY") {
+        this._buyCitizenship({"galaxyID": system.info.galaxyID, "systemID": system.info.systemID});
+        this._publishNewsSubscribers();
+        this._runCitizenship();
+    } else if (choice === "LOSE") {
+        this._loseCitizenship({"galaxyID": system.info.galaxyID, "systemID": system.info.systemID});
+        this._publishNewsSubscribers();
+        this._runCitizenship();
+    } else if (choice.startsWith("DISPLAY_")) {
+        var systemId= choice.substring(8);
+        PlayerShip.homeSystem = systemId;
+        log("DayDiplomacyCitizenshipsEngine.(choice.startsWith(\"DISPLAY_\"))","player homeSystem"+PlayerShip.homeSystem);
+    }else {
+        // EXIT
     }
 };
 
+// define the price of the citizenship
 this._payForCitizenship = function () {
     var CitizenshipPrice = 1;
     if (player.credits >= CitizenshipPrice) {
@@ -34,35 +48,37 @@ this._payForCitizenship = function () {
     }
 };
 
-// citizenships: {systemName: citizenship, ...}
-// citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
+//citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
 this._buyCitizenship = function (citizenship) {
     this._payForCitizenship();
     this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)] = citizenship;
 };
 
+//citizenship: {"galaxyID"=>galaxyID, "systemID"=>systemID}
 this._loseCitizenship = function (citizenship) {
     this._payForCitizenship();
     delete this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)];
 };
 
-
-
 this._runCitizenship = function () {
+    var currentSystemName = this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID);
     var opts = {
         screenID: "DiplomacyCitizenshipsScreenId",
         title: "Citizenship",
         allowInterrupt: true,
         exitScreen: "GUI_SCREEN_INTERFACES",
-        choices: {BUY: "Buy "+this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID)+" citizenship",
-            LOSE: "Lose " +this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID)+" citizenship",
+        choices: {BUY: "Buy "+currentSystemName+" citizenship",
+            LOSE: "Lose " +currentSystemName+" citizenship",
             EXIT: "Exit"},
         message: "Citizenships: " + this.$buildCitizenshipsString(this._citizenships)
     };
-    for (var systemName in this._citizenships){
-        if (this._citizenships.hasOwnProperty(systemName)){
-            if (system.info.galaxyID===this._citizenships[systemName].galaxyID){
-                opts.choices["DISPLAY_"+this._citizenships[systemName].systemID] = "Display "+systemName+" citizenship";
+    var currentgalaxyID=system.info.galaxyID;
+    var currentCitizenships = this._citizenships;
+    var currentChoices = opts.choices;
+    for (var systemName in currentCitizenships){
+        if (currentCitizenships.hasOwnProperty(systemName)){
+            if (currentgalaxyID===currentCitizenships[systemName].galaxyID){
+                currentChoices["DISPLAY_"+currentCitizenships[systemName].systemID] = "Display "+systemName+" citizenship";
             }
         }
     }
@@ -94,6 +110,8 @@ this._publishNewsSubscribers = function () {
 /*************************** End OXP private functions ***************************************************/
 
 /*************************** OXP public functions ********************************************************/
+// citizenships: {systemName: citizenship, ...}
+
 this.$buildCitizenshipsString = function (citizenships) {
     var result = "";
     for (var name in citizenships) {
@@ -107,6 +125,10 @@ this.$buildCitizenshipsString = function (citizenships) {
     return result;
 };
 
+/*
+@Description: allows the script which name is given as argument to be called throught the method $playerCitizenshipsUpdated each time the player citizenships are updated. The script must implement that method.
+@param scriptname: String ; the script name property
+*/
 this.$subscribeToPlayerCitizenshipsUpdates = function (scriptname) {
     this._citizenshipsNewsSubscribers.push(scriptname);
 };

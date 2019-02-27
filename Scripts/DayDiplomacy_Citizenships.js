@@ -27,10 +27,9 @@ this.startUp = function () {
 
 this.startUpComplete=function(){
     var capi = this._capi = worldScripts.DayDiplomacy_062_CitizenshipsEngineAPI;
-    var j = system.allShips.length;
     var ships = system.allShips;
+    var j = ships.length;
     while(j--){
-        log("DayDiplomacyCitizenships.startupComplete","home system"+ships[j].homeSystem);
         var shipCitizenships=capi.$retrieveNameFromSystem(system.info.galaxyID,ships[j].homeSystem);
         log("DayDiplomacyCitizenships.startupComplete","ship Citizenships"+shipCitizenships);
     }

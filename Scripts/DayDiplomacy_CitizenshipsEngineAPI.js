@@ -6,6 +6,8 @@ this.licence = "CC-NC-by-SA 4.0";
 this.description = "This script is the citizenships API.";
 
 /*************************** OXP public functions ********************************************************/
+// associate the name corresponding to the following galaxyID and systemID
+
 this.$retrieveNameFromSystem = function(galaxyID, systemID){
     return this._capi._retrieveNameFromSystem(galaxyID, systemID);
 };
