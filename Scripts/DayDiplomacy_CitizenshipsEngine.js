@@ -22,7 +22,7 @@ this._retrieveNameFromSystem = function (galaxyID, systemID) {
 };
 
 /*
-    @Description: call the functions necessary by the player's choice
+    @Description: calls the necessary functions depending on the player's choice
 	@param choice: String; predefined values (BUY, LOSE, DISPLAY_)
 */
 this._F4InterfaceCallback = function (choice) {
@@ -44,9 +44,9 @@ this._F4InterfaceCallback = function (choice) {
 };
 
 /*
-    @Description: define the price of the citizenship
+    @Description: pays for citizenship changes
 */
-this._payForCitizenship = function () {
+this._payForCitizenshipChanges = function () {
     var CitizenshipPrice = 1;
     if (player.credits >= CitizenshipPrice) {
         player.credits -= CitizenshipPrice;
@@ -54,25 +54,25 @@ this._payForCitizenship = function () {
 };
 
 /*
-    @Description: allow the player to buy a citizenship
-	@param citizenship: citizenship; the galaxyID and the systemID
+    @Description: allows the player to buy a citizenship
+	@param citizenship: map; the galaxyID and the systemID
 */
 this._buyCitizenship = function (citizenship) {
-    this._payForCitizenship();
+    this._payForCitizenshipChanges();
     this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)] = citizenship;
 };
 
 /*
-    @Description: allow the player to loose a citizenship
-	@param citizenship: citizenship; the galaxyID and the systemID
+    @Description: allows the player to lose a citizenship
+	@param citizenship: map; the galaxyID and the systemID
 */
 this._loseCitizenship = function (citizenship) {
-    this._payForCitizenship();
+    this._payForCitizenshipChanges();
     delete this._citizenships[this._retrieveNameFromSystem(citizenship.galaxyID, citizenship.systemID)];
 };
 
 /*
-    @Description: the citizenship's choices in the citizenship's screen
+    @Description: displays the citizenship's screen allowing the player to buy and lose citizenships, to display their citizenships and to choose which citizenship is displayed
 */
 this._runCitizenship = function () {
     var currentSystemName = this._retrieveNameFromSystem(system.info.galaxyID, system.info.systemID);
@@ -105,7 +105,7 @@ this._runCitizenship = function () {
 };
 
 /*
-    @Description: hide the interface
+    @Description: hide the HUD and display the interface
  */
 this._displayF4Interface = function () {
     player.ship.hudHidden || (player.ship.hudHidden = true);
@@ -113,7 +113,7 @@ this._displayF4Interface = function () {
 };
 
 /*
-    @Description: the citizenship tab in the F4 interface
+    @Description: displays the citizenship line in the F4 interface
  */
 this._initF4Interface = function () {
     player.ship.dockedStation.setInterface("DiplomacyCitizenships",
@@ -126,7 +126,7 @@ this._initF4Interface = function () {
 };
 
 /*
-    @Description:
+    @Description: calls the method $playerCitizenshipsUpdated() for each subscribed script with the current citizenship dictionnary as argument
  */
 this._publishNewsSubscribers = function () {
     var myNewSubscribers = this._citizenshipsNewsSubscribers;
@@ -139,8 +139,8 @@ this._publishNewsSubscribers = function () {
 
 /*************************** OXP public functions ********************************************************/
 /*
-	@param citizenships: citizenships; an object which the galaxyID and systemID are identify with the system name
-	@return result: String; all of the citizenships, the player have
+	@param citizenships:{(String)systemName: citizenship}; a map in which the systemName is the key and the citizenship is the value
+	@return result: String; a displayable list of citizenship
 */
 this.$buildCitizenshipsString = function (citizenships) {
     var result = "";
@@ -166,18 +166,24 @@ this.$subscribeToPlayerCitizenshipsUpdates = function (scriptname) {
 
 /*************************** Oolite events ***************************************************************/
 /*
-    @Description: call the function initF4interface() when the player is docked
-    @param station: station; an Oolite bject which corespond to a dockable station
+    @Description: displays the citizenship's line in the F4 interface when the player is docked
+    @param station: station; an Oolite object where the ship is docked. We don't use it
  */
 
 this.shipDockedWithStation = function (station) {
     this._initF4Interface();
 };
 
+/*
+    @Description: we stop hidding the HUD when we exit our citizenship interface
+*/
 this.missionScreenEnded = function () {
     player.ship.hudHidden = false;
 };
 
+/*
+    @Description: loads the player's citizenship from the save file, loads the scripts which are subscribed to the citizenshipChangesNews, moreover it initialises the F4 interfaceF
+*/
 this._startUp = function () {
     var api = this._api = worldScripts.DayDiplomacy_002_EngineAPI;
     this._sapi = worldScripts.DayDiplomacy_012_SystemsAPI;
@@ -186,6 +192,7 @@ this._startUp = function () {
     this._initF4Interface();
     delete this._startUp; // No need to startup twice
 };
+
 
 this.startUp = function () {
     worldScripts.DayDiplomacy_000_Engine.$subscribe(this.name);
