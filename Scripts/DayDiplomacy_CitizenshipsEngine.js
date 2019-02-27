@@ -31,7 +31,7 @@ this._F4InterfaceCallback = function (choice) {
         this._loseCitizenship({"galaxyID": system.info.galaxyID, "systemID": system.info.systemID});
         this._publishNewsSubscribers();
         this._runCitizenship();
-    } else if (choice !== null && choice.startsWith("DISPLAY_")) {
+    } else if (choice !== null && choice.substring(0,8) === "DISPLAY_") {
         var systemId= choice.substring(8);
         PlayerShip.homeSystem = systemId;
         log("DayDiplomacyCitizenshipsEngine.(choice.startsWith(\"DISPLAY_\"))","player homeSystem"+PlayerShip.homeSystem);
@@ -78,8 +78,10 @@ this._runCitizenship = function () {
     for (var systemName in currentCitizenships){
         if (currentCitizenships.hasOwnProperty(systemName)){
             if (currentgalaxyID===currentCitizenships[systemName].galaxyID){
-                currentChoices["DISPLAY_"+currentCitizenships[systemName].systemID] = "Display "+systemName+" citizenship";
-                log ("DayDiplomacyCitizenshipsEngine.currentCitizenship","current Citizenship"+currentChoices["DISPLAY_"+currentCitizenships[systemName].systemID])
+                var s = "DISPLAY_"+currentCitizenships[systemName].systemID;
+                var s1 = "Display "+systemName+" citizenship";
+                currentChoices[s] = s1;
+                log ("DayDiplomacyCitizenshipsEngine.currentCitizenship","current citizenship"+s);
             }
         }
     }
