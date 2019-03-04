@@ -193,7 +193,6 @@ this._startUp = function () {
     delete this._startUp; // No need to startup twice
 };
 
-
 this.startUp = function () {
     worldScripts.DayDiplomacy_000_Engine.$subscribe(this.name);
 
